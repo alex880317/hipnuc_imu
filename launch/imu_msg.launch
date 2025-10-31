@@ -1,0 +1,11 @@
+<launch>
+	<rosparam command="load" file="$(find hipnuc_imu)/config/hipnuc_config.yaml" />
+	<node pkg="hipnuc_imu" name="chaohe_imu" type="serial_imu" output="screen" />
+	
+	<!-- 靜態 TF：發布 map -> odom 固定轉換（可選，用於在 RViz 中使用 map 作為固定框架）-->
+	<node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" 
+		  args="0 0 0 0 0 0 map odom" />
+
+	<node pkg="hipnuc_imu" name="sub_spec" type="sub_spec" output="screen" />
+
+</launch>
