@@ -1,9 +1,9 @@
 #hipnuc config
 imu_serial: "/dev/ttyUSB0"
 baud_rate: 115200
-frame_id: "base_link"
-imu_topic: "/IMU_data"
-parent_frame: "odom"  # 固定框架，可以是 "odom" 或 "map"
+frame_id: "imu_link"  # 必須與 cartographer tracking_frame 一致，且與 base_link 共位（無位移）
+imu_topic: "/sensor/imu/data"  # cartographer 期望的主題
+parent_frame: "base_link"  # 固定框架，可以是 "odom" 或 "map"
 
 #hipnuc data package 
 frame_id_costom: "base_link_hipnuc"
