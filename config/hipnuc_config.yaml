@@ -1,9 +1,14 @@
 #hipnuc config
-imu_serial: "/dev/ttyUSB0"
+imu_serial: "/dev/ttyIMU"
 baud_rate: 115200
-frame_id: "imu_link"  # 必須與 cartographer tracking_frame 一致，且與 base_link 共位（無位移）
+frame_id: "imu_link"  # 必須與 cartographer tracking_frame 一致，與 laser 位置一致（base_link 前方 0.66 米）
 imu_topic: "/sensor/imu/data"  # cartographer 期望的主題
 parent_frame: "base_link"  # 固定框架，可以是 "odom" 或 "map"
+
+# TF 位置偏移參數（相對於 parent_frame）
+tf_offset_x: 0.66  # X 軸偏移（米），與 laser 位置一致
+tf_offset_y: 0.0   # Y 軸偏移（米）
+tf_offset_z: 0.0   # Z 軸偏移（米）
 
 #hipnuc data package 
 frame_id_costom: "base_link_hipnuc"

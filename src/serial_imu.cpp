@@ -43,6 +43,9 @@ sensor_msgs::Imu imu_data;
 tf2_ros::TransformBroadcaster* tf_broadcaster_ptr = nullptr;
 std::string parent_frame;
 std::string child_frame;
+double tf_offset_x = 0.0;
+double tf_offset_y = 0.0;
+double tf_offset_z = 0.0;
 
 int n = 0;
 int rev = 0;
@@ -93,10 +96,10 @@ void read_imu(int fd)
 						transformStamped.transform.rotation.z = imu_data.orientation.z / quat_norm;
 						transformStamped.transform.rotation.w = imu_data.orientation.w / quat_norm;
 						
-						// 位置設為 (0, 0, 0)，因為純 IMU 沒有位置資訊
-						transformStamped.transform.translation.x = 0.0;
-						transformStamped.transform.translation.y = 0.0;
-						transformStamped.transform.translation.z = 0.0;
+						// 位置使用配置的偏移量（預設為 0.66 米前方，與 laser 位置一致）
+						transformStamped.transform.translation.x = tf_offset_x;
+						transformStamped.transform.translation.y = tf_offset_y;
+						transformStamped.transform.translation.z = tf_offset_z;
 						
 						tf_broadcaster_ptr->sendTransform(transformStamped);
 					}
@@ -193,6 +196,11 @@ int main(int argc, char** argv)
 	ros::param::param<std::string>("/imu_topic", imu_topic, "/IMU_data");
 	ros::param::param<std::string>("/parent_frame", parent_frame, "odom");
 	
+	// 讀取 TF 位置偏移參數（預設值與 laser 位置一致：0.66 米前方）
+	ros::param::param<double>("/tf_offset_x", tf_offset_x, 0.66);
+	ros::param::param<double>("/tf_offset_y", tf_offset_y, 0.0);
+	ros::param::param<double>("/tf_offset_z", tf_offset_z, 0.0);
+	
 	child_frame = frame_id;
 
     IMU_pub = n.advertise<sensor_msgs::Imu>(imu_topic, 5);
@@ -209,6 +217,7 @@ int main(int argc, char** argv)
 	p.events = POLLIN;
 	
 	ROS_INFO("IMU TF Broadcaster started: %s -> %s", parent_frame.c_str(), child_frame.c_str());
+	ROS_INFO("IMU TF offset: x=%.2f, y=%.2f, z=%.2f", tf_offset_x, tf_offset_y, tf_offset_z);
 
 	while(ros::ok())
 	{
